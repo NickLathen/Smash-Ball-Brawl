@@ -1,4 +1,4 @@
-const socketPort = 3001;
+const socketPort = process.env.SOCKET_PORT || 3001;
 const socketManager = process.env.SOCKET_MANAGER || '127.0.0.1';
 const socketManagerPort = 4444;
 const io = require('socket.io')(socketPort);
@@ -6,39 +6,28 @@ const matchController = require('./matchController.js');
 const request = require('request');
 
 const sendServerUpdate = function sendServerUpdate() {
+  const body = matchController.getMatch() ? JSON.stringify(matchController.getMatch().buildMatchInfo()) : '{}';
+  body.port = socketPort;
   const options = {
     method: 'POST',
     uri: `http://${socketManager}:${socketManagerPort}/statusPoll`,
     headers: {
       'Content-Type': 'text/plain'
     },
-    body: matchController.getMatch() ? JSON.stringify(matchController.getMatch().buildMatchInfo()) : '{}'
+    body: body
   };
-  request(options, function(error, response, body) {
+  request(options, function (error, response, body) {
     if (error) {
       console.error(error);
     }
   });
-}
+};
 
-setTimeout(function() {
-  const options = {
-    method: 'POST',
-    uri: `http://${socketManager}:${socketManagerPort}/register`,
-    headers: {
-      'Content-Type': 'text/plain'
-    },
-    body: 'registerMe'
-  };
-  request(options, function(error, response, body) {
-    if (error) {
-      console.error(error);
-    }
-    setInterval(function() {
-      sendServerUpdate();
-    }, 5000);
-  })
-}, 3000); 
+
+setInterval(function() {
+  sendServerUpdate();
+}, 1500);
+
 
 console.log('Physics server listening on ' + socketPort);
 io.on('connection', (socket) => {

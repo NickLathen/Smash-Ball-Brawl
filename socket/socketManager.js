@@ -16,28 +16,8 @@ const server = http.createServer((req, res) => {
 });
 server.listen(httpPort);
 
-const register = function(req, res) {
-  let serverUrl = req.connection.remoteAddress;
-  if (serverUrl.indexOf('::ffff:') !== -1) {
-    serverUrl = serverUrl.slice(7);
-  }
-  console.log('registering new physics server at ' + serverUrl);
-  if (physicsServers[serverUrl]) {
-    clearInterval(physicsServer[serverUrl].timeout)
-  }
-  physicsServers[serverUrl] = {status: 'empty'};
-  const server = physicsServers[serverUrl];
-  server.lastUpdate = Date.now();
-  server.timeout = setInterval(function() {
-    if (Date.now() - server.lastUpdate > 8000) {
-      console.log(`Server at ${serverUrl} timed out.`);
-      clearInterval(server.timeout);
-      delete physicsServers[serverUrl];
-    }
-  }, 10 * 1000);
-
-  res.statusCode = 200;
-  res.end('success');
+const loadBody = function loadBody (request, callback) {
+  
 }
 
 const liveGames = function(req, res) {
@@ -53,6 +33,21 @@ const liveGames = function(req, res) {
 }
 
 const statusPoll = function(req, res) {
+  const register = function(serverUrl) {
+    console.log('Registering new physics server at ' + serverUrl)
+    physicsServers[serverUrl] = {status: 'empty'};
+    const newServer = physicsServers[serverUrl];
+    newServer.lastUpdate = Date.now();
+    newServer.timeout = setInterval(function() {
+      if (Date.now() - newServer.lastUpdate > 8000) {
+        console.log(`Server at ${serverUrl} timed out.`);
+        clearInterval(server.timeout);
+        delete physicsServers[serverUrl];
+      }
+    }, 10 * 1000);
+    return newServer;
+  }
+
   let serverUrl = req.connection.remoteAddress;
   if (serverUrl.indexOf('::ffff:') !== -1) {
     serverUrl = serverUrl.slice(7);
@@ -62,17 +57,7 @@ const statusPoll = function(req, res) {
   req.on('end', function() {
     let server = physicsServers[serverUrl];
     if (!server) {
-      console.log('re-registering new physics server at ' + serverUrl)
-      physicsServers[serverUrl] = {status: 'empty'};
-      server = physicsServers[serverUrl];
-      server.lastUpdate = Date.now();
-      server.timeout = setInterval(function() {
-        if (Date.now() - server.lastUpdate > 8000) {
-          console.log(`Server at ${serverUrl} timed out.`);
-          clearInterval(server.timeout);
-          delete physicsServers[serverUrl];
-        }
-      }, 10 * 1000);
+      server = register(serverUrl);
     }
     statusPoll = JSON.parse(statusPoll);
     if (Object.keys(statusPoll).length > 0) { //there is a live match
