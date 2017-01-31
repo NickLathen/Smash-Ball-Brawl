@@ -11,10 +11,6 @@ class JoinMatchData extends React.Component {
   constructor(props) {
     super(props);
 
-    if (this.props.match.maxPlayers === 0) {
-      this.props.match.maxPlayers = 'Sandbox';
-    }
-
     this.JoinMatch = this.JoinMatch.bind(this)
     this.props.match.numPlayers = Object.keys(this.props.match.clients).length;
   }
@@ -32,7 +28,7 @@ class JoinMatchData extends React.Component {
         <img alt={userProfile.maps[this.props.match.mapChoice].name} src={userProfile.maps[this.props.match.mapChoice].thumb} />
       </div>
       <div className='JoinMatchSpan'>{this.props.match.owner}</div>
-      <div className='JoinMatchSpan'>{Object.keys(this.props.match.clients).length} / {this.props.match.maxPlayers}</div>
+      <div className='JoinMatchSpan'>{Object.keys(this.props.match.clients).length} / {+this.props.match.maxPlayers || 'Sandbox'}</div>
       <div className='JoinMatchSpan'>
         <button onClick={() => this.JoinMatch(this.props.match.url)} className={Object.keys(this.props.match.clients).length === this.props.match.maxPlayers || Object.keys(this.props.match.clients).length === 6 ? 'btn btn-danger' : 'btn btn-success'}>{Object.keys(this.props.match.clients).length === this.props.match.maxPlayers || Object.keys(this.props.match.clients).length === 6 ? 'Game Full' : 'Join Game'}</button>
       </div>

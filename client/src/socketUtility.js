@@ -120,7 +120,6 @@ module.exports = {
   },
   joinMatch: function joinMatch(matchUrl, game) {
     socket = io(matchUrl);
-
     setTimeout(function() {
       addUpdateListeners(socket);
       const player = game.camera.toJSON();

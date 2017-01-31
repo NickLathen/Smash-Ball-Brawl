@@ -2,9 +2,6 @@ var path = require('path');
 var webpack = require('webpack');
 require('babel-polyfill');
 
-//var IS_PRODUCTION = process.env.NODE_ENV === 'production';
-var IS_PRODUCTION = process.argv.indexOf('--prod') !== -1;
-
 var ENTRY_POINTS = [
   './client/src/index'
 ];
@@ -13,17 +10,20 @@ var JS_LOADERS = [
   'babel?cacheDirectory&presets[]=react,presets[]=es2015,presets[]=stage-0'
 ];
 
+const usePlugins = true;
 var PLUGINS = [];
-if (IS_PRODUCTION) {
-  // Uglify in production.
-  PLUGINS.push(
-    new webpack.optimize.UglifyJsPlugin({
-      mangle: {
-        except: ['$super', '$', 'exports', 'require']
-      },
-      sourcemap: false
-    })
-  );
+if (usePlugins) {
+  PLUGINS.push(new webpack.DefinePlugin({
+    'process.env': {
+      NODE_ENV: JSON.stringify('production')
+    }
+  }));
+  PLUGINS.push(new webpack.optimize.UglifyJsPlugin({
+    mangle: {
+      except: ['$super', '$', 'exports', 'require']
+    },
+    sourcemap: false
+  }));
 }
 
 module.exports = {
