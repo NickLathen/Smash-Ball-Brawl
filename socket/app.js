@@ -6,8 +6,9 @@ const matchController = require('./matchController.js');
 const request = require('request');
 
 const sendServerUpdate = function sendServerUpdate() {
-  const body = matchController.getMatch() ? JSON.stringify(matchController.getMatch().buildMatchInfo()) : '{}';
+  let body = matchController.getMatch() ? matchController.getMatch().buildMatchInfo() : {};
   body.port = socketPort;
+  body = JSON.stringify(body);
   const options = {
     method: 'POST',
     uri: `http://${socketManager}:${socketManagerPort}/statusPoll`,

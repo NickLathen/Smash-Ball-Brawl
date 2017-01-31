@@ -88,7 +88,7 @@ module.exports = {
             break;
           }
         }
-        socket = io(serverUrl + ':3001');
+        socket = io(serverUrl);
         socket.addEventListener('connect', function() {
           addUpdateListeners(socket);
           const camera = game.camera.toJSON();
