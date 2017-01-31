@@ -246,6 +246,14 @@ canvas {
   margin-top: 20px;
 }
 
+#criticalMessage {
+  position: fixed;
+  font-size: 30px;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .playerBoxContainer {
   pointer-events: none;
   text-align: center;

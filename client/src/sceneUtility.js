@@ -215,8 +215,12 @@ module.exports = {
 
     let victory = false;
     let playersAlive = [];
-    let players = Object.keys(matchInfo.clients).length;
+    let players = Object.keys(matchInfo.clients).length || 0;
 
+    const messageEl = document.getElementById('criticalMessage');
+    if (messageEl.innerText.indexOf('Game') === 0 && players >= matchInfo.maxPlayers) {
+      messageEl.innerText = '';
+    }
 
     //check who is alive and set health and names
     Object.keys(matchInfo.clients).forEach( (uuid) => {

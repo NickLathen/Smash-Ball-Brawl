@@ -10,7 +10,7 @@ var JS_LOADERS = [
   'babel?cacheDirectory&presets[]=react,presets[]=es2015,presets[]=stage-0'
 ];
 
-const usePlugins = true;
+const usePlugins = false;
 var PLUGINS = [];
 if (usePlugins) {
   PLUGINS.push(new webpack.DefinePlugin({

@@ -49,7 +49,7 @@ class HUD extends React.Component {
     socketUtility.quitMatch();
     $(document).off();
     userProfile.matchId = null;
-    browserHistory.push('GameOver');
+    browserHistory.push('Home');
   }
 
 
@@ -59,6 +59,10 @@ class HUD extends React.Component {
         <div id='victoryBox'>
           <div>GAME OVER</div>
           <div id='victor'></div>
+        </div>
+        <div id='criticalMessage'>
+          <p>Game will start once all players have joined!</p>
+          <p>Use the 'Play' button on homepage for singleplayer</p>
         </div>
 
         <div id='HUD'>
