@@ -46,7 +46,7 @@ module.exports = function Match(deleteMatch) {
   this.sendPoll = sendPoll.bind(this);
   this.clientPoll = setInterval(function() {
     this.sendPoll();
-  }.bind(this), 5000);
+  }.bind(this), 2000);
 };
 
 const loadPoll = function loadPoll(clientUuid) {

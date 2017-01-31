@@ -38,6 +38,7 @@ io.on('connection', (socket) => {
       const scene = fullScene.scene;
       const player = fullScene.camera;
       const match = matchController.getNewMatch();
+      sendServerUpdate();
       const maxPlayers = fullScene.maxPlayers;
       socket.join(match.guid);
       match.loadFullScene(scene, player, io, maxPlayers, fullScene.spawnPoints, fullScene.owner, fullScene.mapChoice);
@@ -68,6 +69,7 @@ io.on('connection', (socket) => {
     } else {
       socket.join(match.guid, function() {
         match.loadNewClient(player);
+        sendServerUpdate();
         match.sendFull = true;
         match.physicsEmit(match, socket);
         socket.on('shootBall', function(camera) {
@@ -91,4 +93,7 @@ io.on('connection', (socket) => {
       });
     }
   });
+  socket.on('disconnect', function() {
+    sendServerUpdate();
+  })
 });
