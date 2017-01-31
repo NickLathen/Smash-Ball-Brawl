@@ -3,18 +3,24 @@ services:
   web:
     image: mhart/alpine-node:6
     volumes:
-      - '.:/fraggle-rock'
-    ports:
-      - '80:9999'
-    env_file:
-      .env
-    command: node fraggle-rock/server/app.js
+      - '.:/sbb'
+    network_mode: "host"
+    ports: 
+      - '9999:9999'
+    command: node /sbb/server/app.js
   socketmanager:
     image: mhart/alpine-node:6
     volumes:
-      - '.:/fraggle-rock'
-    ports:
+      - '.:/sbb'
+    ports: 
       - '4444:4444'
-    env_file:
-      .env
-    command: node fraggle-rock/socket/socketManager.js
+    network_mode: "host"
+    command: node /sbb/socket/socketManager.js
+  socket:
+    image: mhart/alpine-node:6
+    volumes:
+      - '.:/sbb'
+    network_mode: "host"
+    ports: 
+      - '3001:3001'
+    command: node /sbb/socket/app.js
