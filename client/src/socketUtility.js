@@ -72,6 +72,26 @@ const hasChangedInput = function hasChangedInput(playerInput) {
   return hasChanged;
 }
 
+const findBestEmptyServerUrl = function findBestEmptyServerUrl(serverList) {
+  const serverHostnameList = {};
+  let bestServer;
+  for (var url in serverList) {
+    const serverInfo = serverList[url];
+    const serverHostname = url.slice(0, url.indexOf(':'));
+    const serverPort = url.slice(url.indexOf(':') + 1);
+    serverHostnameList[serverHostname] = serverHostnameList[serverHostname] || {hostname: serverHostname, openPorts: [], priority: 0};
+    const currentServer = serverHostnameList[serverHostname];
+    if (serverInfo === 'empty') {
+      currentServer.openPorts.push(serverPort);
+      currentServer.priority++;
+      if (!bestServer || currentServer.priority > bestServer.priority) {
+        bestServer = currentServer;
+      }
+    }
+  };
+
+  return bestServer.hostname + ':' + bestServer.openPorts[0];
+};
 
 module.exports = {
   requestNewMatch: function requestNewMatch(game, maxPlayers) {
@@ -80,14 +100,7 @@ module.exports = {
       method: 'GET',
       success: (data) => {
         const physicsServers = JSON.parse(data);
-        let serverUrl;
-        for (var url in physicsServers) {
-          const server = physicsServers[url];
-          if (server === 'empty') {
-            serverUrl = url;
-            break;
-          }
-        }
+        let serverUrl = findBestEmptyServerUrl(physicsServers);
         socket = io(serverUrl);
         socket.addEventListener('connect', function() {
           addUpdateListeners(socket);
@@ -106,7 +119,7 @@ module.exports = {
     });
   },
   joinMatch: function joinMatch(matchUrl, game) {
-    socket = io(matchUrl + ':3001');
+    socket = io(matchUrl);
 
     setTimeout(function() {
       addUpdateListeners(socket);
