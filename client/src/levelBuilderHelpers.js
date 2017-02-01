@@ -3,7 +3,7 @@ const objectBuilder = require('./objectBuilder');
 const userProfile = require('./component/userProfile');
 
 const random = function random(low, high) {
-  return Math.floor(Math.random() * (high - low + 1)) + low;
+  return (Math.random() * (high - low + 1)) + low;
 }
 
 //FLOOR BLOCKS
@@ -94,7 +94,7 @@ module.exports = {
       const x = random(fx - r, fx + r);
       const y = fy + i * 10;
       const z = random(fz - r, fz + r);
-      const type = random(0, types.length - 1);
+      const type = Math.floor(random(0, types.length - 1));
       let mesh = objectBuilder[types[type]]({width: size, height: size, depth: size}, {x, y, z});
       scene.add(mesh);
     }

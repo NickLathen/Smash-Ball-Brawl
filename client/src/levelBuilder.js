@@ -9,6 +9,42 @@ const spawnPoints = [
   [[0, 0, 0], [0, 5, 25], [0, 5, -25], [50, 20, 0], [-50, 20, 0]]
 ];
 
+const buildSandbox = function buildSandbox() {
+  const scene = this.buildBlankLevel();
+  let mesh;
+
+  //Side Panels
+  mesh = objectBuilder.sidePanel(
+    {width: 50, height: 1, depth: 6},
+    {x: 0, y: -25, z: -48},
+    {x: 0, y: 0, z: 0, w: 0 });
+  scene.add(mesh);
+
+  mesh = objectBuilder.sidePanel(
+    {width: 50, height: 1, depth: 6},
+    {x: 0, y: -25, z: 48},
+    {x: 0, y: 0, z: 0, w: 0 }
+  );
+  scene.add(mesh);
+
+  // buildFloor(A, B, y, width, height, depth, scene)
+  // builds square grass floor of A by A with a rock center of B by B, at y height.
+  // Blocks will be width x height x depth;
+  helpers.buildFloor(10, 5, 0, -5, 0, 4, 6, 4, scene);
+  helpers.buildFloor(4, 3, 50, 10, 50, 4, 6, 4, scene);
+  helpers.buildFloor(4, 3, -50, 10, -50, 4, 6, 4, scene);
+  helpers.buildFloor(6, 3, 50, -10, -50, 4, 6, 4, scene);
+  helpers.buildFloor(6, 3, -50, -10, 50, 4, 6, 4, scene);
+
+  //randomCrateGen(n, a, b, fx, fy, fz, r, scene)
+  //builds n crates of size a to b at fx, fy, fz with +/- r random variance in fx and fz
+  helpers.randomCrateGen(5, 4, 8, 0, 0, 0, 20, scene);
+  helpers.randomCrateGen(5, 4, 8, -50, 0, 50, 4, scene);
+  helpers.randomCrateGen(5, 4, 8, 50, 0, -50, 4, scene);
+
+  return scene;
+}
+
 const buildFraggleRock = function buildFraggleRock(options) {
   const scene = this.buildBlankLevel();
   let mesh;
@@ -145,6 +181,7 @@ const buildBlankLevel = function buildBlankLevel() {
 }
 
 module.exports = function LevelBuilder() {
+  this.buildSandbox = buildSandbox.bind(this);
   this.buildFraggleRock = buildFraggleRock.bind(this);
   this.buildDawnMountain = buildDawnMountain.bind(this);
   this.buildHighNoon = buildHighNoon.bind(this);

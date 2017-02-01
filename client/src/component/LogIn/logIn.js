@@ -25,7 +25,12 @@ class LogIn extends React.Component {
 
   playAsGuest() {
     userProfile.User = randomGenerator();
-    browserHistory.push('/Home')
+    browserHistory.push('/Home');
+  }
+
+  justPlay() {
+    userProfile.User = randomGenerator();
+    browserHistory.push('/Game');
   }
 
   responseFacebook(e) {
@@ -86,6 +91,9 @@ class LogIn extends React.Component {
           <img src='../../../textures/logotext.png' id='NonSelect'/>
           <div id='LogIn'>
             <div id='Facebook'>
+              <div id='JustPlay'>
+                <button onClick={this.justPlay} id='JustPlayBtn' className='btn btn-warning'>Play</button>
+              </div>
               <FacebookLogin
                   appId="1709766049351226"
                   autoLoad={false}
@@ -94,7 +102,7 @@ class LogIn extends React.Component {
                   callback={this.responseFacebook}
               />
               <div id='Guest'>
-                <button onClick={this.playAsGuest} id='GuestLogIn' className='btn btn-warning'>Play As Guest</button>
+                <button onClick={this.playAsGuest} id='GuestLogIn' className='btn btn-warning'>Login As Guest</button>
               </div>
             </div>
           </div>

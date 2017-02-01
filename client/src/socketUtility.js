@@ -1,12 +1,12 @@
 const THREE = require('three');
 const io = require('socket.io-client');
-const socket = io(window.location.hostname + ':3333');
 const sceneUtility = require('./sceneUtility');
 const flat = require('../../config/flat');
 const config = require('../../config/config');
 const userProfile = require('./component/userProfile');
 const lastEmittedClient = {theta: 0};
 const audio = require('./audio');
+let socket;
 let canEmitQ = true;
 let emitQ;
 
@@ -72,35 +72,66 @@ const hasChangedInput = function hasChangedInput(playerInput) {
   return hasChanged;
 }
 
+const findBestEmptyServerUrl = function findBestEmptyServerUrl(serverList) {
+  const serverHostnameList = {};
+  let bestServer;
+  for (var url in serverList) {
+    const serverInfo = serverList[url];
+    const serverHostname = url.slice(0, url.indexOf(':'));
+    const serverPort = url.slice(url.indexOf(':') + 1);
+    serverHostnameList[serverHostname] = serverHostnameList[serverHostname] || {hostname: serverHostname, openPorts: [], priority: 0};
+    const currentServer = serverHostnameList[serverHostname];
+    if (serverInfo === 'empty') {
+      currentServer.openPorts.push(serverPort);
+      currentServer.priority++;
+      if (!bestServer || currentServer.priority > bestServer.priority) {
+        bestServer = currentServer;
+      }
+    }
+  };
+
+  return bestServer.hostname + ':' + bestServer.openPorts[0];
+};
 
 module.exports = {
-  requestNewMatch: function requestNewMatch(game) {
-    addUpdateListeners(socket);
-    const camera = game.camera.toJSON();
-    camera.position = game.camera.position;
-    camera.quaternion = game.camera.quaternion;
-    camera.direction = game.camera.getWorldDirection();
-
-    // declare your name and skin
-    camera.skinPath = userProfile.ChosenSkin;
-    camera.name = userProfile.User;
-
-    const fullScene = {camera: camera, scene: game.scene.toJSON(), spawnPoints: game.spawnPoints,
-      maxPlayers: game.maxPlayers, owner: game.owner, mapChoice: game.mapChoice};
-    socket.emit('fullScene', fullScene);
+  requestNewMatch: function requestNewMatch(game, maxPlayers) {
+    $.ajax({
+      url: '/api/liveGames',
+      method: 'GET',
+      success: (data) => {
+        const physicsServers = JSON.parse(data);
+        let serverUrl = findBestEmptyServerUrl(physicsServers);
+        socket = io(serverUrl);
+        socket.addEventListener('connect', function() {
+          addUpdateListeners(socket);
+          const camera = game.camera.toJSON();
+          camera.position = game.camera.position;
+          camera.quaternion = game.camera.quaternion;
+          camera.direction = game.camera.getWorldDirection();
+          // declare your name and skin
+          camera.skinPath = userProfile.ChosenSkin;
+          camera.name = userProfile.User;
+          const fullScene = {camera: camera, scene: game.scene.toJSON(), spawnPoints: game.spawnPoints,
+          maxPlayers: game.maxPlayers, owner: game.owner, mapChoice: game.mapChoice};
+          socket.emit('fullScene', fullScene);
+        });
+      }
+    });
   },
-  joinMatch: function joinMatch(matchNumber, game) {
-    addUpdateListeners(socket);
-    const player = game.camera.toJSON();
-    player.position = game.camera.position;
-    player.direction = game.camera.getWorldDirection();
-    player.quaternion = game.camera.quaternion;
+  joinMatch: function joinMatch(matchUrl, game) {
+    socket = io(matchUrl);
+    setTimeout(function() {
+      addUpdateListeners(socket);
+      const player = game.camera.toJSON();
+      player.position = game.camera.position;
+      player.direction = game.camera.getWorldDirection();
+      player.quaternion = game.camera.quaternion;
 
-    // sending my name and skin to other players
-    player.name = userProfile.User;
-    player.skinPath = userProfile.ChosenSkin;
-
-    socket.emit('addMeToMatch', {matchId: matchNumber, player: player});
+      // sending my name and skin to other players
+      player.name = userProfile.User;
+      player.skinPath = userProfile.ChosenSkin;
+      socket.emit('addMeToMatch', {player: player});
+    }, 1500);
   },
   emitClientPosition: function emitClientPositon(camera, playerInput) {
     playerInput.direction = camera.getWorldDirection();

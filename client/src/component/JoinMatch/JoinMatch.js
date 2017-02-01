@@ -34,17 +34,32 @@ class JoinMatch extends React.Component {
         })
       }
     }
-    setInterval(() => {
-      if (!this.state.refresh) {
+    const loadMatches = function loadMatches(component) {
+      if (!component.state.refresh) {
         $.ajax({
           url: '/api/liveGames',
           method: 'GET',
           success: (data) => {
-            this.setState({liveMatches: JSON.parse(data)})
+            const physicsServers = JSON.parse(data);
+            const liveMatches = [];
+            for (var url in physicsServers) {
+              const server = physicsServers[url];
+              if (server !== 'empty' && Object.keys(server.clients).length !== server.maxPlayers && Object.keys(server.clients).length < 6) {
+                server.url = url;
+                liveMatches.push(server)
+              }
+            }
+            component.setState({liveMatches: liveMatches})
           }
         });
       }
-    }, 2000);
+    };
+    loadMatches(this);
+    this.pollInterval = setInterval(loadMatches.bind(null, this), 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.pollInterval);
   }
 
   backToHome() {
@@ -53,22 +68,6 @@ class JoinMatch extends React.Component {
 
   selectSkin() {
     browserHistory.push('/SelectSkin')
-  }
-
-  refresh() {
-    if (!this.state.refresh) {
-      this.setState({refresh: true});
-      $.ajax({
-        url: '/api/liveGames',
-        method: 'GET',
-        success: (data) => {
-          this.setState({liveMatches: JSON.parse(data)});
-          setTimeout(() => {
-            this.setState({refresh: false})
-          }, 1000);
-        }
-      });
-    }
   }
 
   render() {
@@ -83,9 +82,6 @@ class JoinMatch extends React.Component {
             <h1>Join Match</h1>
             <button className='btn btn-warning selectSkinBtn' onClick={this.selectSkin}>Select Skin</button>
           </div>
-          <button className='btn-md btn-primary btn-refresh' onClick={this.refresh.bind(this)}>
-            Refresh <img id='refreshButton' src='./assets/iconrefresh.png' />
-          </button>
           <div id='JoinMatchData'>
             <div id='JoinMatchTable'>
               <div className='JoinMatchHeader'>
@@ -95,7 +91,7 @@ class JoinMatch extends React.Component {
                 <div className='JoinMatchSpan'></div>
               </div>
               <div className='JoinMatchBody'>
-                {this.state.liveMatches.map((match) => <JoinMatchData key={match.matchId} match={match} />)}
+                {this.state.liveMatches.map((match) => <JoinMatchData key={match.url} match={match} />)}
               </div>
             </div>
           </div>

@@ -40,23 +40,24 @@ module.exports = function Match(deleteMatch) {
   this.tickRate = config.tickRate;
   this.killFloor = killFloor.bind(this);
   this.sendFull = true;
-  this.kill = function() {deleteMatch(this.guid)}.bind(this);
   this.io;
+  this.buildMatchInfo = buildMatchInfo.bind(this);
+  this.lastPoll = performance.now();
   this.sendPoll = sendPoll.bind(this);
   this.clientPoll = setInterval(function() {
     this.sendPoll();
-  }.bind(this), 5000);
+  }.bind(this), 2000);
 };
 
 const loadPoll = function loadPoll(clientUuid) {
   if (this.clients[clientUuid]) {
     this.clients[clientUuid].lastUpdate = performance.now();
   }
+  this.lastPoll = performance.now();
 };
 
-//send match info to clients
-const sendPoll = function sendPoll() {
-  const matchInfo = {clients: {}, maxPlayers: this.maxPlayers, numPlayers: Object.keys(this.clients).length };
+const buildMatchInfo = function buildMatchInfo() {
+  const matchInfo = {clients: {}, maxPlayers: this.maxPlayers, numPlayers: this.numPlayers, owner: this.owner, mapChoice: this.mapChoice };
   for (var key in this.clients) {
     const client = this.clients[key];
     let score = 0;
@@ -74,7 +75,16 @@ const sendPoll = function sendPoll() {
       score
     });
   }
-  this.io.to(this.guid).emit('poll', JSON.stringify(matchInfo));
+  return matchInfo;
+};
+
+const sendPoll = function sendPoll() {
+  const now = performance.now();
+  if (now - this.lastPoll > 10 * 1000) {
+    this.deleteMatch();
+  } else {
+    this.io.to(this.guid).compress(true).emit('poll', JSON.stringify(this.buildMatchInfo()));
+  }
 };
 
 const loadClientUpdate = function loadClientUpdate(clientPosition) {
@@ -171,15 +181,15 @@ const physicsEmit = function physicsEmit (match, socket) {
   if (socket === undefined) {
     if (players.length > 0) {
       if (match.sendFull || clear.length > 0) {
-        match.io.to(match.guid).emit('fullPhysicsUpdate', JSON.stringify(update));
+        match.io.to(match.guid).compress(true).emit('fullPhysicsUpdate', JSON.stringify(update));
       } else {
-        match.io.to(match.guid).volatile.emit('physicsUpdate', JSON.stringify(update));
+        match.io.to(match.guid).volatile.compress(true).emit('physicsUpdate', JSON.stringify(update));
       }
     } else {
       match.deleteMatch(match.guid);
     }
   } else {
-    socket.emit('fullPhysicsUpdate', JSON.stringify(update));
+    socket.compress(true).emit('fullPhysicsUpdate', JSON.stringify(update));
   }
   match.sendFull = false;
 };

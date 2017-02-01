@@ -11,20 +11,14 @@ class JoinMatchData extends React.Component {
   constructor(props) {
     super(props);
 
-    if (this.props.match.maxPlayers === 0) {
-      this.props.match.maxPlayers = 'Sandbox';
-    }
     this.JoinMatch = this.JoinMatch.bind(this)
+    this.props.match.numPlayers = Object.keys(this.props.match.clients).length;
   }
 
-  JoinMatch(matchId) {
-    if(this.props.match.numPlayers === this.props.match.maxPlayers || this.props.match.numPlayers === 6) {
-
-    } else {
+  JoinMatch(matchUrl) {
       userProfile.createMatch = false;
-      userProfile.matchId = matchId;
-      browserHistory.push('/Game');    
-    }
+      userProfile.matchUrl = matchUrl;
+      browserHistory.push('/Game');
   }
 
   render() {
@@ -34,9 +28,9 @@ class JoinMatchData extends React.Component {
         <img alt={userProfile.maps[this.props.match.mapChoice].name} src={userProfile.maps[this.props.match.mapChoice].thumb} />
       </div>
       <div className='JoinMatchSpan'>{this.props.match.owner}</div>
-      <div className='JoinMatchSpan'>{this.props.match.numPlayers} / {this.props.match.maxPlayers}</div>
+      <div className='JoinMatchSpan'>{Object.keys(this.props.match.clients).length} / {+this.props.match.maxPlayers || 'Sandbox'}</div>
       <div className='JoinMatchSpan'>
-        <button onClick={() => this.JoinMatch(this.props.match.matchId)} className={this.props.match.numPlayers === this.props.match.maxPlayers || this.props.match.numPlayers === 6 ? 'btn btn-danger' : 'btn btn-success'}>{this.props.match.numPlayers === this.props.match.maxPlayers || this.props.match.numPlayers === 6 ? 'Game Full' : 'Join Game'}</button>
+        <button onClick={() => this.JoinMatch(this.props.match.url)} className={Object.keys(this.props.match.clients).length === this.props.match.maxPlayers || Object.keys(this.props.match.clients).length === 6 ? 'btn btn-danger' : 'btn btn-success'}>{Object.keys(this.props.match.clients).length === this.props.match.maxPlayers || Object.keys(this.props.match.clients).length === 6 ? 'Game Full' : 'Join Game'}</button>
       </div>
     </div>
     )

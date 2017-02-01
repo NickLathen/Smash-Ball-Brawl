@@ -9,7 +9,7 @@ module.exports = {
   hat: 'ha2.obj',
   maps: [
     {name: 'Fraggle Rock', thumb: '../../../textures/fraggleRockThumb.jpg'},
-    {name: 'Dawn Mountain', thumb: '../../../textures/dawnMountainThumb.jpg'},
+    {name: 'Dawn Mountain', thumb: '../../../textures/dawnmountainThumb.jpg'},
     {name: 'High Noon', thumb: '../../../textures/highNoonThumb.jpg'}
   ],
   map: 0,
@@ -34,7 +34,7 @@ module.exports = {
       '/textures/skins/Batman.jpg': {skinPic: '../../../textures/skins/batmanPreview.jpg', skin: '/textures/skins/Batman.jpg', name: 'Batman', price: 400},
       '/textures/skins/8ball.jpg': {skinPic: '../../../textures/skins/8BallPreview.jpg', skin: '/textures/skins/8ball.jpg', name: '8 Ball', price: 250},
       '/textures/skins/CaptainAmerica.jpg': {skinPic: '../../../textures/skins/CaptainAmericaPreview.jpg', skin: '/textures/skins/CaptainAmerica.jpg', name: 'Captain America', price: 400},
-      'ha2.obj': {skinPic: '../../../textures/Skins/hat.jpg', skin: 'ha2.obj', name: 'The Hat', price: 1500, type: 'hat'}
+      'ha2.obj': {skinPic: '../../../textures/Skins/hatPreview.jpg', skin: 'ha2.obj', name: 'The Hat', price: 1500, type: 'hat'}
     },
   sound: 1,
   maxPlayers: null,

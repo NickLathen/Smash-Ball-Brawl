@@ -120,7 +120,7 @@ module.exports = {
           const regen = function regen() {
             if (jumpCount < config.maxJumps) {
               jumpCount++;
-              if (userProfile.matchId || userProfile.createMatch) {
+              if (userProfile.matchUrl || userProfile.createMatch) {
                 document.getElementById('jump' + jumpCount).style.opacity = '1';
               }
             }
@@ -182,7 +182,7 @@ module.exports = {
         const regen = function regen() {
           if (shotCount < config.maxShots) {
             shotCount++;
-            if (userProfile.matchId || userProfile.createMatch) {
+            if (userProfile.matchUrl || userProfile.createMatch) {
               document.getElementById('ammo' + shotCount).style.opacity = '1';
             }
           }
@@ -215,8 +215,12 @@ module.exports = {
 
     let victory = false;
     let playersAlive = [];
-    let players = Object.keys(matchInfo.clients).length;
+    let players = Object.keys(matchInfo.clients).length || 0;
 
+    const messageEl = document.getElementById('criticalMessage');
+    if (messageEl.innerText.indexOf('Game') === 0 && players >= matchInfo.maxPlayers) {
+      messageEl.innerText = '';
+    }
 
     //check who is alive and set health and names
     Object.keys(matchInfo.clients).forEach( (uuid) => {
@@ -295,21 +299,23 @@ module.exports = {
     if (Math.abs(clientPosition.position.y) > config.playerVerticalBound
     || Math.abs(clientPosition.position.x) > config.playerHorizontalBound
     || Math.abs(clientPosition.position.z) > config.playerHorizontalBound) {
-      //death sound
-      audio.smashBrawl.shootRound(2, 1, 0.08, 0, 1);
+      if (currentGame.matchInfo.clients[clientPosition.uuid] && currentGame.matchInfo.clients[clientPosition.uuid].lives > 0) {
+        //death sound
+        audio.smashBrawl.shootRound(2, 1, 0.08, 0, 1);
+        //reset ammo and jumps if you are the player that died
+        if (currentGame.camera.uuid.slice(0, config.uuidLength) === clientPosition.uuid) {
+          jumpCount = 3;
+          shotCount = 3;
 
-      //reset ammo and jumps if you are the player that died
-      if (currentGame.camera.uuid.slice(0, config.uuidLength) === clientPosition.uuid) {
-        jumpCount = 3;
-        shotCount = 3;
-
-        for (var i = 1; i <= 3; i++) {
-          if (userProfile.matchId || userProfile.createMatch) {
-            document.getElementById('jump' + i).style.opacity = '1';
-            document.getElementById('ammo' + i).style.opacity = '1';
+          for (var i = 1; i <= 3; i++) {
+            if (userProfile.matchId || userProfile.createMatch) {
+              document.getElementById('jump' + i).style.opacity = '1';
+              document.getElementById('ammo' + i).style.opacity = '1';
+            }
           }
         }
       }
+
     }
 
     if (currentGame.camera.uuid.slice(0, config.uuidLength) !== clientPosition.uuid) {

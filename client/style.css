@@ -246,6 +246,14 @@ canvas {
   margin-top: 20px;
 }
 
+#criticalMessage {
+  position: fixed;
+  font-size: 30px;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .playerBoxContainer {
   pointer-events: none;
   text-align: center;
@@ -484,6 +492,18 @@ canvas {
   margin: auto;
 }
 
+#PlayBtn {
+  margin-bottom: 10px;
+  font-size: 25px;
+}
+
+#JustPlayBtn {
+  margin-bottom: 20px;
+  font-size: 30px;
+  background-color: #4C69BA;
+  border-color: #4C69BA;
+}
+
 #Guest {
   margin-top: 20px;
 }
@@ -621,7 +641,7 @@ canvas {
 .buttonBox {
   width: 100%;
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 0px;
 }
 
 .buttonBox > h1 {
@@ -692,12 +712,13 @@ canvas {
 /*-----------------------Create Match------------------------*/
 
 #StartMatch {
-  margin-top: 40px;
+  margin-top: 0px;
 }
 
 #StartMatch .btn {
   margin-right: 10px;
   margin-left: 10px;
+  margin-bottom: 5px;
 }
 
 #ChooseMap {
@@ -763,7 +784,7 @@ canvas {
   width: 185px;
   border-radius: 10px;
   background-color: white;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   cursor: pointer;
   color: black;
 }

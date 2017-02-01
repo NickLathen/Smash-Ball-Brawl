@@ -1,23 +1,15 @@
 'use strict';
 const express = require('express');
-const http = require('http');
+const request = require('request');
+const socketManager = process.env.SOCKET_MANAGER || '127.0.0.1';
+const socketManagerPort = 4444;
 
 const router = express.Router();
 
 router.route('/liveGames')
   .get((req, res) => {
-    http.get('http://localhost:3332/liveGames', function(response) {
-      response.setEncoding('utf8');
-        let rawData = '';
-      response.on('data', (chunk) => rawData += chunk);
-      response.on('end', () => {
-        try {
-          res.send(rawData);
-        } catch (e) {
-          console.log(e.message);
-        }
-      });
-    })
-  })
-
+    request(`http://${socketManager}:${socketManagerPort}/liveGames`, function(error, response, body) {
+      res.send(body);
+    });
+  });
 module.exports = router;

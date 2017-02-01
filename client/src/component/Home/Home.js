@@ -49,6 +49,10 @@ class Home extends React.Component {
       }   
     }
   }
+  
+  justPlay() {
+    browserHistory.push('/Game')
+  }
 
   CreateMatch() {
     browserHistory.push('/CreateMatch')
@@ -75,6 +79,9 @@ class Home extends React.Component {
         </div>
         <div id='HomeScene'>
           <img src='../../../textures/logotext.png' id='NonSelect'/>
+          <div id="Play">
+            <button id="PlayBtn" onClick={this.justPlay} className='btn btn-primary'>Play</button>
+          </div>
           <div id="joinButtons">
             <button id="joinMatch" onClick={this.CreateMatch} className='btn btn-primary'>Create Match</button>
             <button id="joinExisting" onClick={this.JoinMatch} className='btn btn-primary'>Join Match</button>
